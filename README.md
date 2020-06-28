@@ -249,4 +249,4 @@ const io = new IntersectionObserver(ioes => {
 
 [代码 github 地址](https://github.com/touH/lazyloadimg)
 
-[语雀地址](!https://www.yuque.com/honghuaqi/zx2d4b/gbvobn)
+[语雀地址](https://www.yuque.com/honghuaqi/zx2d4b/gbvobn)
