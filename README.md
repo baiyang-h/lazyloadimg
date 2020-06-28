@@ -244,7 +244,9 @@ const io = new IntersectionObserver(ioes => {
 
 
 
-
 参考文章：
 基本是全部复制黏贴了   [原生JS实现最简单的图片懒加载](https://juejin.im/post/59cb634a6fb9a00a4843bea9)
+
 [代码 github 地址](https://github.com/touH/lazyloadimg)
+
+[语雀地址](!https://www.yuque.com/honghuaqi/zx2d4b/gbvobn)
