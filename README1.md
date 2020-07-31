@@ -12,7 +12,7 @@
 ### 什么时候用懒加载
 
 
-页面中需要一次性载入很多图片的时候，往往都需要用懒加载的。
+放页面中需要一次性载入很多图片的时候，往往都需要用懒加载的。
 
 
 ### 懒加载原理
@@ -52,27 +52,29 @@
 ### 如何判断元素是否在可视区域
 
 
-#### 1. 使用Js盒子模型的方式
+#### 方法一
 
 
 网上看到好多这种方法，稍微记录一下
 
 
 1. 通过 `document.documentElement.clientHeight` 获取屏幕可视窗口高度。
-1. 通过 `element.offsetTop` 获取元素相对于文档（文档要是定位，否则会是相对应body）顶部的距离
+1. 通过 `element.offsetTop` 获取元素相对于文档顶部的距离
 1. 通过 `document.documentElement.scrollTop` 获取浏览器窗口顶部与文档顶部之间的距离，即滚动条滚动距离。
 
 
 
 然后 ②-③<① 是否成立，如果成立，元素就在可视区域内。
 
-![image.png](https://cdn.nlark.com/yuque/0/2020/png/312064/1593337334778-c7959231-25fb-462f-9561-b300c93d0322.png#align=left&display=inline&height=584&margin=%5Bobject%20Object%5D&name=image.png&originHeight=1500&originWidth=1892&size=287698&status=done&style=none&width=736)
-#### 2. getBoundingingClientRect
-
+![image.png](https://cdn.nlark.com/yuque/0/2020/png/312064/1593337334778-c7959231-25fb-462f-9561-b300c93d0322.png)
+#### 方法二 getBoundingingClientRect
 
 通过 `getBoundingClientRect()` 方法来获取元素的大小以及位置，这个方法返回一个名为 `ClientRect` 的 `DOMRect` 对象，包含了 `top` 、`right`、`bottom`、`left`、`width`、`height` 这些值。
-![image.png](https://cdn.nlark.com/yuque/0/2020/png/312064/1593337685460-26d89c87-67e5-4770-9656-4daccd600f03.png#align=left&display=inline&height=573&margin=%5Bobject%20Object%5D&name=image.png&originHeight=500&originWidth=500&size=26950&status=done&style=none&width=573)
+
+![image.png](https://cdn.nlark.com/yuque/0/2020/png/312064/1593337685460-26d89c87-67e5-4770-9656-4daccd600f03.png)
 可以看出返回的元素位置是相对于左上角而言的，而不是边距。
+
+
 
 
 我们思考一下，什么清情况下图片进入可视区域。
@@ -102,7 +104,7 @@ function isInSight(el) {
 页面打开时需要对所有图片进行检查，是否在可视区域内，如果是就加载。
 ```javascript
 function checkImgs() {
-  const imgs = document.querySelectorAll('img');
+  const imgs = document.querySelectorAll('.my-photo');
   Array.from(imgs).forEach(el => {
     // 如果在可视区，则加载图片
     if (isInSight(el)) {
@@ -157,40 +159,35 @@ function throttle(fn, mustRun = 500) {
 ```
 这里的`mustRun`就是调用函数的时间间隔，无论多么频繁的调用`fn`，只有`remaining>=mustRun`时`fn`才能被执行。
 
-## 验证
+## 实验
 
 
 ### 页面打开时
 
-
-![image.png](https://cdn.nlark.com/yuque/0/2020/png/312064/1593347543483-debb297a-19c5-46f5-9b41-e75e72a0f993.png#align=left&display=inline&height=481&margin=%5Bobject%20Object%5D&name=image.png&originHeight=961&originWidth=1915&size=405130&status=done&style=none&width=957.5)
+![image.png](https://cdn.nlark.com/yuque/0/2020/png/312064/1593347543483-debb297a-19c5-46f5-9b41-e75e72a0f993.png)
 可以看出此时仅仅是加载了img1和img2，其它的img都没发送请求，看看此时的浏览器
 
 ### 页面滚动时
 
-
-![image.png](https://cdn.nlark.com/yuque/0/2020/png/312064/1593347625199-442aa6ee-cca2-454e-afc0-62c247f47607.png#align=left&display=inline&height=475&margin=%5Bobject%20Object%5D&name=image.png&originHeight=950&originWidth=1915&size=531698&status=done&style=none&width=957.5)
+![image.png](https://cdn.nlark.com/yuque/0/2020/png/312064/1593347625199-442aa6ee-cca2-454e-afc0-62c247f47607.png)
 加载接下来的图片
 
 
 ### 全部载入时
 
-
 当滚动条滚动到最底下时，全部请求都应该是发出的，如图：
-![image.png](https://cdn.nlark.com/yuque/0/2020/png/312064/1593347712713-5a8104e5-c38c-43c6-85e2-7097533458e5.png#align=left&display=inline&height=426&margin=%5Bobject%20Object%5D&name=image.png&originHeight=851&originWidth=950&size=252567&status=done&style=none&width=475)
+![image.png](https://cdn.nlark.com/yuque/0/2020/png/312064/1593347712713-5a8104e5-c38c-43c6-85e2-7097533458e5.png)
 
 
 ## 方法三 IntersectionObserver
 
+使用 `IntersectionObserver` API，可以自动观察元素是否在视口内
 
-使用 [IntersectionObserver](https://developer.mozilla.org/zh-CN/docs/Web/API/IntersectionObserver) API，可以自动观察元素是否在视口内。
-
-
-```javascript
+```js
 var observer = new IntersectionObserver(callback[, options]);
 ```
-options 中可以设置监听的祖先元素 element 对象，其边界盒将被视作视口。如果没有设置，默认观察顶级文档的视窗。具体可查看文档
 
+options 中可以设置监听的祖先元素 element 对象，其边界盒将被视作视口。如果没有设置，默认观察顶级文档的视窗。具体可查看文档
 
 > IE 好像不支持该方法
 
@@ -214,12 +211,15 @@ callback的参数是一个数组，每个数组都是一个`IntersectionObserver
 | intersectionRatio | 目标元素的可见比例，即intersectionRect占boundingClientRect的比例，完全可见时为1，完全不可见时小于等于0 |
 | target | 被观察的目标元素，是一个 DOM 节点对象 |
 
+
 我们需要用到`intersectionRatio`来判断是否在可视区域内，当`intersectionRatio > 0 && intersectionRatio <= 1`即在可视区域内。
+
+
 
 ```javascript
 function checkImgs() {
-  const imgs = Array.from(document.querySelectorAll("img"));
-  imgs.forEach(item => io.observe(item));    //观测到了才会执行 IntersectionObserver 内部的函数
+  const imgs = Array.from(document.querySelectorAll(".my-photo"));
+  imgs.forEach(item => io.observe(item));
 }
 
 function loadImg(el) {
@@ -247,13 +247,14 @@ const io = new IntersectionObserver(ioes => {
 </script>
 ```
 注意观察 这种方法只会加载可视区，如果用上面那种方法，如果一开始就在最底部，那么9张图片都会加载，而使用 `IntersectionObserver` 只加载了可视区，如 该可视区 只有2张
-![image.png](https://cdn.nlark.com/yuque/0/2020/png/312064/1593348772520-115dc198-662e-4e95-a0c3-b08e1a99f2e6.png#align=left&display=inline&height=469&margin=%5Bobject%20Object%5D&name=image.png&originHeight=937&originWidth=1889&size=344131&status=done&style=none&width=944.5)
+![image.png](https://cdn.nlark.com/yuque/0/2020/png/312064/1593348772520-115dc198-662e-4e95-a0c3-b08e1a99f2e6.png)
 
 
 
-
-## 参考文章
-
+## 参考文章：
 
 1. 基本是全部复制黏贴了   [原生JS实现最简单的图片懒加载](https://juejin.im/post/59cb634a6fb9a00a4843bea9)
-1. [案列代码 github 地址](https://github.com/touH/lazyloadimg)
+
+2. [案例代码 github 地址](https://github.com/touH/lazyloadimg)
+
+3. [语雀地址](https://www.yuque.com/honghuaqi/zx2d4b/gbvobn)
